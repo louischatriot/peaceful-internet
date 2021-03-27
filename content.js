@@ -40,6 +40,7 @@ if (location.href.match(/^https:\/\/linkedin.com\/?$|^https:\/\/www\.linkedin\.c
       button.type = "button";
       button.value = "Actually I want to waste time on LinkedIn's front page";
       button.style["font-size"] = "18px";
+      button.style["margin-top"] = "20px";
       button.id = "actually-show-frontpage";
       button.addEventListener("click", actuallyShowLinkedInFrontpage);
       document.querySelector(".scaffold-layout__inner").prepend(button);
@@ -59,6 +60,7 @@ if (location.href.match(/^https:\/\/linkedin.com\/?$|^https:\/\/www\.linkedin\.c
       button.value = "Actually I need to use the chat";
       button.style["font-size"] = "18px";
       button.style["margin-right"] = "20px";
+      button.style["margin-top"] = "20px";
       button.id = "actually-show-chat";
       button.addEventListener("click", actuallyShowLinkedInChat);
       document.querySelector(".scaffold-layout__inner").prepend(button);
