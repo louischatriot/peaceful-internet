@@ -1,0 +1,15 @@
+{
+  "manifest_version": 2,
+  "name": "Peaceful Slack",
+  "version": "0.1",
+  "web_accessible_resources" : [ "images/*.png" ],
+  "content_scripts": [
+    {
+      "matches": ["https://app.slack.com/*", "https://www.linkedin.com/*", "https://linkedin.com/*"],
+      "js": ["content.js"]
+    }
+  ],
+  "icons": { "48": "images/slack48.png",
+             "128": "images/slack128.png" }
+}
+
