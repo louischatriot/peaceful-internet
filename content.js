@@ -1,4 +1,16 @@
 
+// No unread email notification in title
+if (location.href.startsWith("https://mail.google.com/")) {
+  var title = document.querySelector("title");
+
+  setInterval(function () {
+    title.textContent = title.textContent.replace(/\([0-9]+\) /, "");
+  }, 150);
+}
+
+
+
+
 // No Slack notification on favicon
 if (location.host === "app.slack.com") {
   var file = 'images/slack.png';

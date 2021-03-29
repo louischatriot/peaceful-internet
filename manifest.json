@@ -5,7 +5,11 @@
   "web_accessible_resources" : [ "images/*.png" ],
   "content_scripts": [
     {
-      "matches": ["https://app.slack.com/*", "https://www.linkedin.com/*", "https://linkedin.com/*"],
+      "matches": ["https://app.slack.com/*",
+                  "https://www.linkedin.com/*",
+                  "https://linkedin.com/*",
+                  "https://mail.google.com/*"
+                 ],
       "js": ["content.js"]
     }
   ],
