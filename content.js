@@ -87,3 +87,16 @@ if (location.href.match(/^https:\/\/linkedin.com\/?$|^https:\/\/www\.linkedin\.c
 }
 
 
+if (location.href.startsWith("https://www.linkedin.com/")) {
+
+  // LinkedIn title notification
+  var linkedInTitle = document.querySelector("title");
+
+  setInterval(function () {
+    console.log("ZEREZ");
+    linkedInTitle.textContent = linkedInTitle.textContent.replace(/\([0-9]+\) /, "");
+  }, 150);
+
+}
+
+
