@@ -1,4 +1,19 @@
 
+// Stick to the same favicon + no notification in status bar for Notion
+if (location.href.startsWith("https://www.notion.so/")) {
+  var notionTitle = document.querySelector("title");
+  var notionIcon = 'images/notion.ico';
+  var notionIconUrl = chrome.extension.getURL(notionIcon);
+
+  setInterval(function () {
+    notionTitle.textContent = notionTitle.textContent.replace(/\([0-9]+\+?\) /, "");
+    document.querySelector('link[rel*="icon"]').href = notionIconUrl;
+  }, 150);
+}
+
+
+
+
 // No unread email notification in title
 if (location.href.startsWith("https://mail.google.com/")) {
   var gmailTitle = document.querySelector("title");
