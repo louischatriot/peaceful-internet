@@ -1,7 +1,8 @@
 {
   "manifest_version": 2,
   "name": "Peaceful Internet",
-  "version": "0.1",
+  "version": "0.2",
+  "description": "Remove uneeded attention-grabbing stuff from the Internet",
   "web_accessible_resources" : [ "images/*.png" ],
   "content_scripts": [
     {
@@ -13,7 +14,7 @@
       "js": ["content.js"]
     }
   ],
-  "icons": { "48": "images/slack48.png",
-             "128": "images/slack128.png" }
+  "icons": { "48": "images/peace48.png",
+             "128": "images/peace128.png" }
 }
 

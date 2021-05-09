@@ -1,3 +1,9 @@
+let CSS_RULES = [...document.styleSheets]
+  .map(styleSheet => [...styleSheet.cssRules])
+  .filter(Boolean)
+  .flat();
+
+
 
 // No unread email notification in title
 if (location.href.startsWith("https://mail.google.com/")) {
@@ -10,12 +16,20 @@ if (location.href.startsWith("https://mail.google.com/")) {
 
 
 
-
 // No Slack notification on favicon or title bar
 if (location.host === "app.slack.com") {
   var file = 'images/slack.png';
   var url = chrome.extension.getURL(file);
   var slackTitle = document.querySelector("title");
+
+  var now = new Date();
+
+  if (now.getHours() < 12) {
+    var rule = CSS_RULES.find(rule => rule.selectorText == '.p-channel_sidebar__list');
+    rule.style.display = 'none';
+    var rule = CSS_RULES.find(rule => rule.selectorText == '.c-mention_badge');
+    rule.style.display = 'none';
+  }
 
   setInterval(function() {
     slackTitle.textContent = slackTitle.textContent.replace(/\* /g, "");
@@ -93,7 +107,6 @@ if (location.href.startsWith("https://www.linkedin.com/")) {
   var linkedInTitle = document.querySelector("title");
 
   setInterval(function () {
-    console.log("ZEREZ");
     linkedInTitle.textContent = linkedInTitle.textContent.replace(/\([0-9]+\) /, "");
   }, 150);
 
