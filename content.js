@@ -1,9 +1,56 @@
-let CSS_RULES = [...document.styleSheets]
-  .map(styleSheet => [...styleSheet.cssRules])
-  .filter(Boolean)
-  .flat();
+var pageCss = (function() {
+  var CSS_RULES = [...document.styleSheets]
+    .map(styleSheet => [...styleSheet.cssRules])
+    .filter(Boolean)
+    .flat();
+
+  var separator = "#####";  // Arbitrary string that is very unlikely to be used by a CSS
+  function __id(selectorText, prop) {
+    return selectorText + separator + prop;
+  }
+
+  var res = {};
+  var overriden = {};
+
+  res.overrideRule = function(selectorText, prop, value) {
+    var rule = CSS_RULES.find(rule => rule.selectorText == selectorText);
+    var ruleId = __id(selectorText, prop);
+
+    if (!overriden[ruleId]) {
+      overriden[ruleId] = rule.style[prop];
+    }
+
+    rule.style[prop] = value;
+  };
+
+  res.restoreRule = function(selectorText, prop) {
+    var rule = CSS_RULES.find(rule => rule.selectorText == selectorText);
+    var ruleId = __id(selectorText, prop);
+
+    rule.style[prop] = overriden[ruleId];
+  };
+
+  return res;
+})();
+
+
 
 var REFRESH_INTERVAL = 75
+
+
+  // Should use MutationObserver instead of polling
+  //var observer = new MutationObserver(function (mutations) {
+    //console.log("==============================");
+    //console.log("==============================");
+    //console.log("==============================");
+    //console.log(mutations);
+  //});
+
+  //var b = document.querySelector('body');
+
+  //observer.observe(b, { childList: true });
+
+
 
 
 /**
@@ -60,12 +107,18 @@ if (location.href.startsWith("https://paper.dropbox.com/")) {
 
 
 if (location.href.startsWith("https://app.slack.com/")) {
-  //if (now.getHours() < 12) {
-    //var rule = CSS_RULES.find(rule => rule.selectorText == '.p-channel_sidebar__list');
-    //rule.style.display = 'none';
-    //var rule = CSS_RULES.find(rule => rule.selectorText == '.c-mention_badge');
-    //rule.style.display = 'none';
-  //}
+  pageCss.overrideRule('.p-channel_sidebar__list', 'display', 'none');
+  pageCss.overrideRule('.c-mention_badge', 'display', 'none');
+  pageCss.overrideRule('.c-search_autocomplete__unread_count', 'display', 'none');
+
+  function restoreSlack() {
+    pageCss.restoreRule('.p-channel_sidebar__list', 'display');
+    pageCss.restoreRule('.c-mention_badge', 'display');
+    pageCss.restoreRule('.c-search_autocomplete__unread_count', 'display');
+  }
+
+
+
 
   forceFavicon('images/slack_calm.png');
   noNotificationInTitle(["* ", "! "]);
