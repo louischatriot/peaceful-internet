@@ -1,8 +1,16 @@
+// Should use MutationObserver instead of polling but some websites make it
+// a pain (e.g. favicon dynamically loaded)
+var REFRESH_INTERVAL = 75
+
+
 var pageCss = (function() {
-  var CSS_RULES = [...document.styleSheets]
+  function getAllCssRules() {
+    return [...document.styleSheets]
     .map(styleSheet => [...styleSheet.cssRules])
     .filter(Boolean)
     .flat();
+  }
+  var CSS_RULES = getAllCssRules();
 
   var separator = "#####";  // Arbitrary string that is very unlikely to be used by a CSS
   function __id(selectorText, prop) {
@@ -12,8 +20,7 @@ var pageCss = (function() {
   var res = {};
   var overriden = {};
 
-  res.overrideRule = function(selectorText, prop, value) {
-    // TODO: handle case where the rule has not yet been created (yielding a can't set property to null)
+  res.__overrideRule = function(selectorText, prop, value) {
 
 
     var rule = CSS_RULES.find(rule => rule.selectorText == selectorText);
@@ -26,6 +33,17 @@ var pageCss = (function() {
     rule.style[prop] = value;
   };
 
+  res.overrideRule = function(selectorText, prop, value) {
+    try {
+      res.__overrideRule(selectorText, prop, value);
+    } catch (e) {
+      // Of course it could fail in a different way but CSS not fully loaded is
+      // the one we want to catch here
+      CSS_RULES = getAllCssRules();
+      setTimeout(res.overrideRule.bind(res, selectorText, prop, value), REFRESH_INTERVAL);
+    }
+  };
+
   res.restoreRule = function(selectorText, prop) {
     var rule = CSS_RULES.find(rule => rule.selectorText == selectorText);
     var ruleId = __id(selectorText, prop);
@@ -35,25 +53,6 @@ var pageCss = (function() {
 
   return res;
 })();
-
-
-
-var REFRESH_INTERVAL = 75
-
-
-  // Should use MutationObserver instead of polling
-  //var observer = new MutationObserver(function (mutations) {
-    //console.log("==============================");
-    //console.log("==============================");
-    //console.log("==============================");
-    //console.log(mutations);
-  //});
-
-  //var b = document.querySelector('body');
-
-  //observer.observe(b, { childList: true });
-
-
 
 
 /**
@@ -129,11 +128,15 @@ if (location.href.startsWith("https://app.slack.com/")) {
     restoreButton.style.display = "none";  // TODO: remove from DOM
   }
 
-  // TODO: replace timeout by gracefully waiting for Slack to be ready
-  setTimeout(function() {
+  function insertRestoreButton() {
     var sidebar = document.querySelector(".p-channel_sidebar");
-    sidebar.prepend(restoreButton);
-  }, 5000);
+    if (!sidebar) {
+      setTimeout(insertRestoreButton, REFRESH_INTERVAL);
+    } else {
+      sidebar.prepend(restoreButton);
+    }
+  }
+  insertRestoreButton();
 
   forceFavicon('images/slack_calm.png');
   noNotificationInTitle(["* ", "! "]);
