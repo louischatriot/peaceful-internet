@@ -67,7 +67,7 @@ if (location.href.startsWith("https://app.slack.com/")) {
     //rule.style.display = 'none';
   //}
 
-  forceFavicon('images/slack.png');
+  forceFavicon('images/slack_calm.png');
   noNotificationInTitle(["* ", "! "]);
 }
 
