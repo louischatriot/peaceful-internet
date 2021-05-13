@@ -10,6 +10,7 @@
                   "https://www.linkedin.com/*",
                   "https://linkedin.com/*",
                   "https://mail.google.com/*",
+                  "https://paper.dropbox.com/*",
                   "https://www.notion.so/*"
                  ],
       "js": ["content.js"]
