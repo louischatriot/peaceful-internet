@@ -1,4 +1,19 @@
 
+// Stick to the same favicon + no notification in status bar for Notion
+if (location.href.startsWith("https://www.notion.so/")) {
+  var notionTitle = document.querySelector("title");
+  var notionIcon = 'images/notion.ico';
+  var notionIconUrl = chrome.extension.getURL(notionIcon);
+
+  setInterval(function () {
+    notionTitle.textContent = notionTitle.textContent.replace(/\([0-9]+\+?\) /, "");
+    document.querySelector('link[rel*="icon"]').href = notionIconUrl;
+  }, 150);
+}
+
+
+
+
 // No unread email notification in title
 if (location.href.startsWith("https://mail.google.com/")) {
   var gmailTitle = document.querySelector("title");
@@ -91,6 +106,19 @@ if (location.href.match(/^https:\/\/linkedin.com\/?$|^https:\/\/www\.linkedin\.c
       clearInterval(chat_interval_id);
     }
   }, 100)
+
+}
+
+
+if (location.href.startsWith("https://www.linkedin.com/")) {
+
+  // LinkedIn title notification
+  var linkedInTitle = document.querySelector("title");
+
+  setInterval(function () {
+    console.log("ZEREZ");
+    linkedInTitle.textContent = linkedInTitle.textContent.replace(/\([0-9]+\) /, "");
+  }, 150);
 
 }
 
