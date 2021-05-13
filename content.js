@@ -9,7 +9,15 @@ if (location.href.startsWith("https://mail.google.com/")) {
 }
 
 
+// No notification on Paper (what use do they serve anyway???)
+if (location.href.startsWith("https://paper.dropbox.com/")) {
+  var paperNotif = document.querySelector(".hp-notifications-badge");
 
+  setInterval(function () {
+    paperNotif.style.display = "none";
+  }, 150);
+
+}
 
 // No Slack notification on favicon or title bar
 if (location.host === "app.slack.com") {

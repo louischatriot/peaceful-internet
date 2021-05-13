@@ -8,7 +8,8 @@
       "matches": ["https://app.slack.com/*",
                   "https://www.linkedin.com/*",
                   "https://linkedin.com/*",
-                  "https://mail.google.com/*"
+                  "https://mail.google.com/*",
+                  "https://paper.dropbox.com/*"
                  ],
       "js": ["content.js"]
     }
