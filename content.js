@@ -1,26 +1,45 @@
+var REFRESH_INTERVAL = 75
 
-// Stick to the same favicon + no notification in status bar for Notion
-if (location.href.startsWith("https://www.notion.so/")) {
-  var notionTitle = document.querySelector("title");
-  var notionIcon = 'images/notion.ico';
-  var notionIconUrl = chrome.extension.getURL(notionIcon);
+
+/**
+ * Force page to use the supplied faviconFile
+ * Prevents both websites that update favicons (e.g. Slack) and websites
+ * that allow different favicons for the same kind of resources (e.g. Notion)
+ */
+function forceFavicon(faviconFile) {
+  var faviconUrl = chrome.extension.getURL(faviconFile);
+  var favicon;
 
   setInterval(function () {
-    notionTitle.textContent = notionTitle.textContent.replace(/\([0-9]+\+?\) /, "");
-    document.querySelector('link[rel*="icon"]').href = notionIconUrl;
-  }, 150);
+    if (!favicon) { favicon = document.querySelector('link[rel*="icon"]'); }
+    if (favicon) { favicon.href = faviconUrl; }
+  }, REFRESH_INTERVAL);
 }
 
 
-
-
-// No unread email notification in title
-if (location.href.startsWith("https://mail.google.com/")) {
-  var gmailTitle = document.querySelector("title");
+/**
+ * Prevent notification number from appearing in the title
+ * Remove all supplied characters as well
+ */
+function noNotificationInTitle(_unneededStrings) {
+  var title = document.querySelector("title");
+  var unneededStrings = _unneededStrings || [];
 
   setInterval(function () {
-    gmailTitle.textContent = gmailTitle.textContent.replace(/\([0-9]+\) /, "");
-  }, 150);
+    title.textContent = title.textContent.replace(/\([0-9]+\+?\) /, "");
+    unneededStrings.forEach(s => title.textContent = title.textContent.split(s).join(""));
+  }, REFRESH_INTERVAL);
+}
+
+
+if (location.href.startsWith("https://www.notion.so/")) {
+  forceFavicon('images/notion.ico');
+  noNotificationInTitle();
+}
+
+
+if (location.href.startsWith("https://mail.google.com/")) {
+  noNotificationInTitle();
 }
 
 
@@ -34,17 +53,11 @@ if (location.href.startsWith("https://paper.dropbox.com/")) {
 
 }
 
-// No Slack notification on favicon or title bar
-if (location.host === "app.slack.com") {
-  var file = 'images/slack.png';
-  var url = chrome.extension.getURL(file);
-  var slackTitle = document.querySelector("title");
 
-  setInterval(function() {
-    slackTitle.textContent = slackTitle.textContent.replace(/\* /g, "");
-    slackTitle.textContent = slackTitle.textContent.replace(/! /g, "");
-    document.querySelector('link[rel*="icon"]').href = url;
-  }, 150)
+// No Slack notification on favicon or title bar
+if (location.href.startsWith("https://app.slack.com/")) {
+  forceFavicon('images/slack.png');
+  noNotificationInTitle(["* ", "! "]);
 }
 
 
@@ -111,15 +124,7 @@ if (location.href.match(/^https:\/\/linkedin.com\/?$|^https:\/\/www\.linkedin\.c
 
 
 if (location.href.startsWith("https://www.linkedin.com/")) {
-
-  // LinkedIn title notification
-  var linkedInTitle = document.querySelector("title");
-
-  setInterval(function () {
-    console.log("ZEREZ");
-    linkedInTitle.textContent = linkedInTitle.textContent.replace(/\([0-9]+\) /, "");
-  }, 150);
-
+  noNotificationInTitle();
 }
 
 
