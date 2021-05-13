@@ -13,6 +13,9 @@ var pageCss = (function() {
   var overriden = {};
 
   res.overrideRule = function(selectorText, prop, value) {
+    // TODO: handle case where the rule has not yet been created (yielding a can't set property to null)
+
+
     var rule = CSS_RULES.find(rule => rule.selectorText == selectorText);
     var ruleId = __id(selectorText, prop);
 
@@ -111,14 +114,26 @@ if (location.href.startsWith("https://app.slack.com/")) {
   pageCss.overrideRule('.c-mention_badge', 'display', 'none');
   pageCss.overrideRule('.c-search_autocomplete__unread_count', 'display', 'none');
 
+  var restoreButton = document.createElement("button");
+  restoreButton.classList.add("c-button");
+  restoreButton.classList.add("c-button--outline");
+  restoreButton.classList.add("c-button--medium");
+  restoreButton.style.margin = "8px";
+  restoreButton.innerHTML = "Reactivate sidebar and badges";
+  restoreButton.addEventListener("click", restoreSlack);
+
   function restoreSlack() {
     pageCss.restoreRule('.p-channel_sidebar__list', 'display');
     pageCss.restoreRule('.c-mention_badge', 'display');
     pageCss.restoreRule('.c-search_autocomplete__unread_count', 'display');
+    restoreButton.style.display = "none";  // TODO: remove from DOM
   }
 
-
-
+  // TODO: replace timeout by gracefully waiting for Slack to be ready
+  setTimeout(function() {
+    var sidebar = document.querySelector(".p-channel_sidebar");
+    sidebar.prepend(restoreButton);
+  }, 5000);
 
   forceFavicon('images/slack_calm.png');
   noNotificationInTitle(["* ", "! "]);
