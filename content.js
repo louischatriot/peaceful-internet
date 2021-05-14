@@ -1,6 +1,7 @@
 // Should use MutationObserver instead of polling but some websites make it
 // a pain (e.g. favicon dynamically loaded)
-var REFRESH_INTERVAL = 75
+var REFRESH_INTERVAL = 75;
+var SLACK_SIDEBAR_HIDING_TIMEOUT = 15 * 60 * 1000;
 
 
 var pageCss = (function() {
@@ -53,6 +54,17 @@ var pageCss = (function() {
 
   return res;
 })();
+
+
+function legibleDuration(_s) {
+  s = Math.floor(_s / 1000);
+
+  if (s < 60) {
+    return s + "s";
+  } else {
+    return ((s - (s % 60)) / 60) + "m " + (s % 60) + "s"
+  }
+}
 
 
 /**
@@ -109,9 +121,23 @@ if (location.href.startsWith("https://paper.dropbox.com/")) {
 
 
 if (location.href.startsWith("https://app.slack.com/")) {
-  pageCss.overrideRule('.p-channel_sidebar__list', 'display', 'none');
-  pageCss.overrideRule('.c-mention_badge', 'display', 'none');
-  pageCss.overrideRule('.c-search_autocomplete__unread_count', 'display', 'none');
+  function hideSidebarAndBadges() {
+    pageCss.overrideRule('.p-channel_sidebar__list', 'display', 'none');
+    pageCss.overrideRule('.c-mention_badge', 'display', 'none');
+    pageCss.overrideRule('.c-search_autocomplete__unread_count', 'display', 'none');
+    restoreButton.style.display = "flex";
+    explanatoryText.style.display = "block";
+  }
+
+  function restoreSidebarAndBadges() {
+    pageCss.restoreRule('.p-channel_sidebar__list', 'display');
+    pageCss.restoreRule('.c-mention_badge', 'display');
+    pageCss.restoreRule('.c-search_autocomplete__unread_count', 'display');
+    restoreButton.style.display = "none";
+    explanatoryText.style.display = "none";
+
+    setTimeout(hideSidebarAndBadges, SLACK_SIDEBAR_HIDING_TIMEOUT);
+  }
 
   var restoreButton = document.createElement("button");
   restoreButton.classList.add("c-button");
@@ -119,27 +145,27 @@ if (location.href.startsWith("https://app.slack.com/")) {
   restoreButton.classList.add("c-button--medium");
   restoreButton.style.margin = "8px";
   restoreButton.innerHTML = "Reactivate sidebar and badges";
-  restoreButton.addEventListener("click", restoreSlack);
+  restoreButton.addEventListener("click", restoreSidebarAndBadges);
 
-  function restoreSlack() {
-    pageCss.restoreRule('.p-channel_sidebar__list', 'display');
-    pageCss.restoreRule('.c-mention_badge', 'display');
-    pageCss.restoreRule('.c-search_autocomplete__unread_count', 'display');
-    restoreButton.style.display = "none";  // TODO: remove from DOM
-  }
+  var explanatoryText = document.createElement("div");
+  explanatoryText.style.margin = "8px";
+  explanatoryText.innerHTML = "After reactivation, the sidebar will be deactivated again after " + legibleDuration(SLACK_SIDEBAR_HIDING_TIMEOUT) + ".<br><br>You don't need to reactivate it to navigate! Use Ctrl+K or Ctrl+Shift+K (PC) / Cmd+K or Cmd+Shift+K (Mac) to select the conversation you want to jump to.";
 
-  function insertRestoreButton() {
+  function insertControls() {
     var sidebar = document.querySelector(".p-channel_sidebar");
     if (!sidebar) {
-      setTimeout(insertRestoreButton, REFRESH_INTERVAL);
+      setTimeout(insertControls, REFRESH_INTERVAL);
     } else {
+      sidebar.prepend(explanatoryText);
       sidebar.prepend(restoreButton);
     }
   }
-  insertRestoreButton();
+
 
   forceFavicon('images/slack_calm.png');
   noNotificationInTitle(["* ", "! "]);
+  insertControls();
+  hideSidebarAndBadges();
 }
 
 
