@@ -6,10 +6,14 @@ var SLACK_SIDEBAR_HIDING_TIMEOUT = 15 * 60 * 1000;
 
 var pageCss = (function() {
   function getAllCssRules() {
-    return [...document.styleSheets]
-    .map(styleSheet => [...styleSheet.cssRules])
-    .filter(Boolean)
-    .flat();
+    try {
+      return [...document.styleSheets]
+      .map(styleSheet => [...styleSheet.cssRules])
+      .filter(Boolean)
+      .flat();
+    } catch(e) {
+      return [];   // Some websites have CORS rules preventing getting CSS rules
+    }
   }
   var CSS_RULES = getAllCssRules();
 
@@ -169,14 +173,31 @@ if (location.href.startsWith("https://app.slack.com/")) {
 }
 
 
+
+
+
+
 // Only searchbar on LinkedIn
 //if (location.host === "www.linkedin.com" || location.host === "linkedin.com") {
 //if (location.href === "https://www.linkedin.com/feed/") {
 if (location.href.match(/^https:\/\/linkedin.com\/?$|^https:\/\/www\.linkedin\.com\/?$|^https:\/\/www\.linkedin\.com\/feed\/?$/)) {
 
+  function createLinkedInButton(message) {
+    var b = document.createElement("button");
+    b.innerHTML = message;
+    b.classList.add("artdeco-button");
+    b.classList.add("artdeco-button--secondary");
+    b.style["margin-top"] = "10px";
+    b.style["margin-right"] = "10px";
+    return b;
+  }
+
+  var showFrontpageButton = createLinkedInButton("Actually I want to waste time on LinkedIn's front page");
+  var showChatButton = createLinkedInButton("Actually I need to use the chat");
+
   function actuallyShowLinkedInFrontpage() {
     document.querySelector(".scaffold-layout__row").style.display = "";
-    document.getElementById("actually-show-frontpage").style.display = "none";
+    showFrontpageButton.style.display = "none";
 
     // This ugly hack ensures all tiles are well positioned
     window.scrollBy(0,10);
@@ -185,9 +206,8 @@ if (location.href.match(/^https:\/\/linkedin.com\/?$|^https:\/\/www\.linkedin\.c
 
   function actuallyShowLinkedInChat() {
     document.querySelector(".msg-overlay-container").style.display = "";
-    document.getElementById("actually-show-chat").style.display = "none";
+    showChatButton.style.display = "none";
   }
-
 
   // Main screen
   var main_interval_id = setInterval(function() {
@@ -195,18 +215,12 @@ if (location.href.match(/^https:\/\/linkedin.com\/?$|^https:\/\/www\.linkedin\.c
       document.querySelector(".scaffold-layout__row").style.display = "none";
 
       // Add button to display the home page
-      var button = document.createElement("input");
-      button.type = "button";
-      button.value = "Actually I want to waste time on LinkedIn's front page";
-      button.style["font-size"] = "18px";
-      button.style["margin-top"] = "20px";
-      button.id = "actually-show-frontpage";
-      button.addEventListener("click", actuallyShowLinkedInFrontpage);
-      document.querySelector(".scaffold-layout__inner").prepend(button);
+      showFrontpageButton.addEventListener("click", actuallyShowLinkedInFrontpage);
+      document.querySelector(".scaffold-layout__inner").prepend(showFrontpageButton);
 
       clearInterval(main_interval_id);
     }
-  }, 100)
+  }, REFRESH_INTERVAL)
 
   // Chat
   var chat_interval_id = setInterval(function() {
@@ -214,19 +228,12 @@ if (location.href.match(/^https:\/\/linkedin.com\/?$|^https:\/\/www\.linkedin\.c
       document.querySelector(".msg-overlay-container").style.display = "none"
 
       // Add button to display the chat
-      var button = document.createElement("input");
-      button.type = "button";
-      button.value = "Actually I need to use the chat";
-      button.style["font-size"] = "18px";
-      button.style["margin-right"] = "20px";
-      button.style["margin-top"] = "20px";
-      button.id = "actually-show-chat";
-      button.addEventListener("click", actuallyShowLinkedInChat);
-      document.querySelector(".scaffold-layout__inner").prepend(button);
+      showChatButton.addEventListener("click", actuallyShowLinkedInChat);
+      document.querySelector(".scaffold-layout__inner").prepend(showChatButton);
 
       clearInterval(chat_interval_id);
     }
-  }, 100)
+  }, REFRESH_INTERVAL)
 
 }
 
