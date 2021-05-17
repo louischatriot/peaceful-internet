@@ -78,11 +78,10 @@ function legibleDuration(_s) {
  */
 function forceFavicon(faviconFile) {
   var faviconUrl = chrome.extension.getURL(faviconFile);
-  var favicon;
 
   setInterval(function () {
-    if (!favicon) { favicon = document.querySelector('link[rel*="icon"]'); }
-    if (favicon) { favicon.href = faviconUrl; }
+    // Can't keep a reference to the favicon itself as some websites replace the node entirely
+    document.querySelectorAll('link[rel*="icon"]').forEach(icon => icon.href = faviconUrl);
   }, REFRESH_INTERVAL);
 }
 
